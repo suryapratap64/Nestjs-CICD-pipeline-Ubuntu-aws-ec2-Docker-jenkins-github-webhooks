@@ -1,53 +1,108 @@
 pipeline {
     agent any 
 
-    environment{
-        CONTAINER_NAME="nestjs-app"
-        IMAGE_NAME="nesths-image"
-        EMAIL="sps64044@gmail.com"
-        PORT="3000"
-
+    environment {
+        CONTAINER_NAME = "nestjs-app"
+        IMAGE_NAME = "nestjs-image"
+        EMAIL = "sps64044@gmail.com"
+        PORT = "3000"
     }
-    stages{
-        stage('Clone Repo'){
-            steps{
-                git branch:'main',
-                url:'https://github.com/suryapratap64/Nestjs-CICD-pipeline-Ubuntu-aws-ec2-Docker-jenkins-github-webhooks.git'
+
+    stages {
+
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/suryapratap64/Nestjs-CICD-pipeline-Ubuntu-aws-ec2-Docker-jenkins-github-webhooks.git'
             }
         }
 
-        stage('Build Docker Image'){
-            steps{
-                sh 'docker build -t $IMAGE_NAME'
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
-        stage('Stop & Remove Previous Container'){
-            steps{
+
+        stage('Stop & Remove Previous Container') {
+            steps {
                 sh '''
-                docker stop $CONTAINER_NAME ||true
-                docker rm $CONTAINER_NAME ||true
-                
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
                 '''
             }
         }
-        stage('Docker Container Run'){
-            steps{
+
+        stage('Run New Docker Container') {
+            steps {
                 sh '''
-                docker run -d -p ${PORT}:${PORT}
-                --name $CONTAINER_NAME $IMAGE_NAME
-                
+                    docker run -d -p ${PORT}:${PORT} \
+                    --name $CONTAINER_NAME $IMAGE_NAME
                 '''
             }
         }
-         stage('Send email Notification'){
-            steps{
-               emailtext(
-                subject:"Nextjs deploy success full on ec2"
-                body:"Your Nest js app is Deployed!
-                    http://54.167.30.115:${PORT}/"
-                to:"${EMAIL}"
-               )
+
+        stage('Send Email Notification') {
+            steps {
+                emailext(
+                    subject: "NestJS Deploy Successful on EC2",
+                    body: "Your NestJS app has been successfully deployed!\n\nURL: http://54.167.30.115:${PORT}/",
+                    to: "${EMAIL}"
+                )
             }
         }
     }
 }
+
+// pipeline {
+//     agent any 
+
+//     environment{
+//         CONTAINER_NAME="nestjs-app"
+//         IMAGE_NAME="nesths-image"
+//         EMAIL="sps64044@gmail.com"
+//         PORT="3000"
+
+//     }
+//     stages{
+//         stage('Clone Repo'){
+//             steps{
+//                 git branch:'main',
+//                 url:'https://github.com/suryapratap64/Nestjs-CICD-pipeline-Ubuntu-aws-ec2-Docker-jenkins-github-webhooks.git'
+//             }
+//         }
+
+//         stage('Build Docker Image'){
+//             steps{
+//                 sh 'docker build -t $IMAGE_NAME'
+//             }
+//         }
+//         stage('Stop & Remove Previous Container'){
+//             steps{
+//                 sh '''
+//                 docker stop $CONTAINER_NAME ||true
+//                 docker rm $CONTAINER_NAME ||true
+                
+//                 '''
+//             }
+//         }
+//         stage('Docker Container Run'){
+//             steps{
+//                 sh '''
+//                 docker run -d -p ${PORT}:${PORT}
+//                 --name $CONTAINER_NAME $IMAGE_NAME
+                
+//                 '''
+//             }
+//         }
+//          stage('Send email Notification'){
+//             steps{
+//                emailtext(
+//                 subject:"Nextjs deploy success full on ec2",
+//                 body:"Your Nest js app is Deployed!
+//                     http://54.167.30.115:${PORT}/",
+//                 to:"${EMAIL}"
+//                )
+//             }
+//         }
+//     }
+// }
