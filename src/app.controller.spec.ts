@@ -15,8 +15,22 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return success status', () => {
+      expect(appController.getStatus()).toEqual({
+        status: 'success',
+        message: 'Full CI/CD Pipeline Deployment Successful',
+        author: 'Surya Pratap from Prayagraj',
+      });
+    });
+  });
+
+  describe('api/pipeline', () => {
+    it('should return pipeline information', () => {
+      const result = appController.getPipelineInfo();
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('project');
+      expect(result).toHaveProperty('infrastructure');
+      expect(result).toHaveProperty('pipeline');
     });
   });
 });
